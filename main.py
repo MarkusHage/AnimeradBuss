@@ -9,95 +9,157 @@ pygame.init()
 running = True
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Bosses Buss")
+clock = pygame.time.Clock()
 
-passagerarlista = []
+font = pygame.font.SysFont('comicsans', 5)
+bg = pygame.image.load("./assets/121an.jpg")
+bg = pygame.transform.scale(bg, size)
+buss_bild = pygame.image.load("./assets/buss.png")
+buss_bild = pygame.transform.scale(buss_bild, (600,400))
+
+
+
+class Buss():
+    def __init__(self):
+        self.items=[]
+
+    def lägg_till_ny_passagerare(self):
+        if len(buss.items) < 25:
+            ålder = random.randint(5,99)
+            self.items.append(ålder)
+            print(f"En passagerare som är {buss.items[-1]} år gammal hoppade på bussen. Totalt {len(buss.items)} passagerare på bussen.")
+        else:
+            print("Tyvärr grabbar, inga slots lediga. Bussen är full.") 
+
+    def skriv_ut_lista(self):
+        if len(buss.items) > 0:
+            print(buss.items)
+        else:
+            print("Bussen är tom!")
+
+    def skriv_ut_sammanlagd_ålder(self):
+        if len(buss.items) > 0:
+            print(sum(buss.items))
+        else:
+            print("Bussen är tom!")
+
+
+    
+
+class Button(pygame.sprite.Sprite):
+    def __init__(self, color, color_hover, rect, callback, outline=None, text=''):
+        super().__init__()
+        self.text = text
+        temp_rect = pygame.Rect(0, 0, *rect.size)
+
+        self.org = self._create_image(color, outline, text, temp_rect)
+        self.hov = self._create_image(color_hover, outline, text, temp_rect)
+
+        self.image = self.org
+        self.rect = rect
+        self.callback = callback
+
+    def _create_image(self, color, outline, text, rect):
+        img = pygame.Surface(rect.size)
+        if outline:
+            img.fill(outline)
+            img.fill(color, rect.inflate(-4, -4))
+        else:
+            img.fill(color)
+
+        if text != '':
+            text_surf = get_font(10).render(text, 1, pygame.Color('black'))
+            text_rect = text_surf.get_rect(center=rect.center)
+            img.blit(text_surf, text_rect) 
+        return img 
+
+    def update(self, events):
+        pos = pygame.mouse.get_pos()
+        hit = self.rect.collidepoint(pos)
+        self.image = self.hov if hit else self.org
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and hit:
+                self.callback(self)
+
+   
+  
+buss = Buss()
+
+
 
 def get_font(size):
     return pygame.font.Font("./assets/font.ttf", size)
 
-""" def checkForInput(self, position):
-    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-        return True
-    return False """
 
 
-def lägg_till_ny_passagerare():
-    if len(passagerarlista) < 25:
-        RandomÅlder = random.randint(5,99)
-        passagerarlista.append(RandomÅlder)
-        print(f"En passagerare som är {RandomÅlder} år gammal hoppade på bussen. Totalt {len(passagerarlista)} passagerare på bussen.")
-    else:
-       print("Tyvärr grabbar, inga slots lediga. Bussen är full.") 
+
+
         
-def skriv_ut_lista():
-    if len(passagerarlista) > 0:
-        print(passagerarlista)
+""" def skriv_ut_lista():
+    if len(buss.items) > 0:
+        print(buss.items)
     else:
         print("Bussen är tom!")
 
 def skriv_ut_sammanlagd_ålder():
-    if len(passagerarlista) > 0:
-        print(sum(passagerarlista))
+    if len(buss.items) > 0:
+        print(sum(buss.items))
     else:
-        print("Bussen är tom!")
+        print("Bussen är tom!") """
 
 def avsluta():
     print("Avslutar programmet...")
-    running = False
+    pygame.quit()
+    quit()
 
         
 
-#def skriv_ut_lista   
+sprites = pygame.sprite.Group()
+sprites.add(Button(pygame.Color('lightblue'),
+                    pygame.Color('red'),
+                    pygame.Rect(800, 50, 300, 100),
+                    lambda b: buss.lägg_till_ny_passagerare(),
+                    pygame.Color('black'),
+                    'Lägg till'))
+
+sprites.add(Button(pygame.Color('lightblue'),
+                    pygame.Color('red'),
+                    pygame.Rect(800, 200, 300, 100),
+                    lambda b: buss.skriv_ut_lista(),
+                    pygame.Color('black'),
+                    'Skriv ut lista',))
+
+sprites.add(Button(pygame.Color('lightblue'),
+                    pygame.Color('red'),
+                    pygame.Rect(800, 350, 300, 100),
+                    lambda b: buss.skriv_ut_sammanlagd_ålder(),
+                    pygame.Color('black'),
+                    'Skriv ut sammanlagd ålder'))
+
+sprites.add(Button(pygame.Color('lightblue'),
+                   pygame.Color('red'),
+                   pygame.Rect(800, 500, 300, 100),
+                   lambda b: avsluta(),
+                   pygame.Color('black'),
+                   'Avsluta'))
+
+
 
 while running:
-    screen.fill("black")
 
-    mouse_position = pygame.mouse.get_pos()
-
-    meny_text = get_font(40).render("Bosses Buss", True, "#b68f40")
-    meny_rect = meny_text.get_rect(center=(640, 100))
-
-    lägg_till_ny_passagerare_knapp = get_font(20).render("Lägg till passagerare", True, "#b68f40")
-    lägg_till_ny_passagerare_knapp_hover = get_font(20).render("Lägg till passagerare", True, "#7ec0ee")
-    lägg_till_ny_passagerare_rect = lägg_till_ny_passagerare_knapp.get_rect(center=(640, 200))
-
-    skriv_ut_lista_knapp = get_font(20).render("Skriv ut ålder på passagerare", True, "#b68f40")
-    skriv_ut_lista_rect = skriv_ut_lista_knapp.get_rect(center=(640, 350))
-
-    skriv_ut_sammmanlagd_ålder_knapp = get_font(20).render("Skriv ut sammanlagd ålder", True, "#b68f40")
-    skriv_ut_sammanlagd_ålder_rect = skriv_ut_sammmanlagd_ålder_knapp.get_rect(center=(640, 500))
-
-    avsluta_knapp = get_font(20).render("Avsluta", True, "#b68f40")
-    avsluta_rect = avsluta_knapp.get_rect(center=(640, 650))
-
-
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:    
         if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEMOTION:
-            if lägg_till_ny_passagerare_rect.collidepoint(mouse_position):
-                    screen.blit(lägg_till_ny_passagerare_knapp_hover, lägg_till_ny_passagerare_rect)
-            if skriv_ut_lista_rect.collidepoint(mouse_position):
-                    print("Musen är över skriv ut lista-knappen")
-            if skriv_ut_sammanlagd_ålder_rect.collidepoint(mouse_position):
-                    print("Musen är över sammanlagd ålder-knappen")
-            if avsluta_rect.collidepoint(mouse_position):
-                    print("Musen är över avsluta-knappen")
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if lägg_till_ny_passagerare_rect.collidepoint(mouse_position):
-                    lägg_till_ny_passagerare()
-                if skriv_ut_lista_rect.collidepoint(mouse_position):
-                    skriv_ut_lista()
-                if skriv_ut_sammanlagd_ålder_rect.collidepoint(mouse_position):
-                    skriv_ut_sammanlagd_ålder()
-                if avsluta_rect.collidepoint(mouse_position):
-                    running = False
-            
-    screen.blit(meny_text, meny_rect)
-    screen.blit(lägg_till_ny_passagerare_knapp, lägg_till_ny_passagerare_rect)
-    screen.blit(skriv_ut_lista_knapp, skriv_ut_lista_rect)
-    screen.blit(skriv_ut_sammmanlagd_ålder_knapp, skriv_ut_sammanlagd_ålder_rect)
-    screen.blit(avsluta_knapp, avsluta_rect)
+            pygame.quit()
+            quit()
+    
+    screen.blit(bg, (0, 0))
+    screen.blit(buss_bild, (50, 300))  
+    sprites.update(events)
+    #screen.fill(pygame.Color('white'))
+    sprites.draw(screen)
+    pygame.display.update()
+    clock.tick(60)
     
     pygame.display.update()
 
